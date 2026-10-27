@@ -6,6 +6,8 @@
 （`HP ColorLaserJet M153-M154.exe -Start UDCDevicePage`），不依赖 HPLIP
 （HPLIP 对很多新型号读不到页数与碳粉百分比）。
 
+![界面截图](docs/img/screenshot.png)
+
 ## 适用范围
 
 协议逆向自 HP 的 **LEDM over USB**（Lightweight Embedded Device Management）
