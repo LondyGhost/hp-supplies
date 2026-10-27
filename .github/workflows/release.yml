@@ -1,0 +1,128 @@
+name: release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  linux:
+    name: Linux (deb / rpm / AppImage)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential pkg-config \
+            libgtk-3-dev libusb-1.0-0-dev \
+            dpkg-dev rpm file curl ca-certificates
+
+      - name: Download appimagetool
+        run: |
+          curl -fsSL -o "$HOME/appimagetool-x86_64.AppImage" \
+            https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage
+          chmod +x "$HOME/appimagetool-x86_64.AppImage"
+
+      - name: Build packages
+        env:
+          SKIP_ARCH: "1"
+        run: bash packaging/build-all.sh
+
+      - name: Collect artifacts
+        run: |
+          mkdir -p artifacts
+          cp out/*.deb out/*.rpm out/*.AppImage artifacts/ || true
+          rm -f artifacts/*debuginfo*
+          ls -lh artifacts
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: linux-packages
+          path: artifacts/*
+
+  windows:
+    name: Windows (MSYS2 UCRT64)
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: msys2 {0}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: msys2/setup-msys2@v2
+        with:
+          msystem: UCRT64
+          update: true
+          install: >-
+            mingw-w64-ucrt-x86_64-gcc
+            mingw-w64-ucrt-x86_64-gtk3
+            mingw-w64-ucrt-x86_64-libusb
+            mingw-w64-ucrt-x86_64-pkgconf
+            zip
+
+      - name: Build
+        run: bash packaging/windows/build-msys2.sh "${GITHUB_REF_NAME#v}"
+
+      - name: Bundle runtime DLLs and zip
+        run: |
+          VER="${GITHUB_REF_NAME#v}"
+          STAGE="out/windows/stage"
+          mkdir -p "$STAGE"
+          cp out/windows/hp-supplies.exe out/windows/hp-supplies-gui.exe "$STAGE/"
+          # 收集运行时 DLL（GTK3 / libusb / 依赖），排除系统 DLL
+          ldd "$STAGE/hp-supplies.exe" | awk '/=>/ {print $3}' \
+            | grep -E '^/(ucrt64|mingw64)/' | sort -u \
+            | while read -r dll; do cp -v "$dll" "$STAGE/"; done
+          # GTK 资源：主题、图标、schema（否则界面无样式）
+          mkdir -p "$STAGE/share"
+          cp -a /ucrt64/share/themes "$STAGE/share/" || true
+          cp -a /ucrt64/share/icons "$STAGE/share/" || true
+          cp -a /ucrt64/share/glib-2.0 "$STAGE/share/" || true
+          cd out/windows
+          mv stage "hp-supplies-${VER}-windows-x64"
+          zip -r "hp-supplies-${VER}-windows-x64.zip" "hp-supplies-${VER}-windows-x64"
+          mv "hp-supplies-${VER}-windows-x64.zip" ../..
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows-package
+          path: hp-supplies-*-windows-x64.zip
+
+  release:
+    name: Publish GitHub Release
+    needs: [linux, windows]
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: hp-supplies ${{ github.ref_name }}
+          generate_release_notes: true
+          files: dist/*
+          body: |
+            HP 打印机耗材与用量监控（LEDM over USB），只读查询，无需 HPLIP。
+
+            | 文件 | 用途 |
+            |---|---|
+            | `*-amd64.deb` | Debian / Ubuntu / Deepin / UOS |
+            | `*-x86_64.rpm` | Fedora / openEuler / openSUSE |
+            | `*-x86_64.AppImage` | 任意 Linux 发行版，免安装 |
+            | `*-windows-x64.zip` | Windows（解压即用，含 GTK 运行时） |
+
+            Arch Linux 请用仓库内 `packaging/arch/PKGBUILD` 自行 `makepkg`。
+            安装后重新插拔一次 USB 线让 udev 规则生效。
+
+            用法：`hp-supplies`（GUI）/ `hp-supplies --text`（终端）/ `hp-supplies --help`

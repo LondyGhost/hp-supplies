@@ -76,13 +76,17 @@ else
 fi
 
 echo "=== [5/5] 构建 Arch 包 ==="
-ARCHDIR="$OUT/arch"
-rm -rf "$ARCHDIR"; mkdir -p "$ARCHDIR"
-cp "$RPMTOP/SOURCES/${PKGNAME}-${VERSION}.tar.gz" "$ARCHDIR/"
-cp packaging/arch/PKGBUILD packaging/arch/${PKGNAME}.install "$ARCHDIR/"
-( cd "$ARCHDIR" && makepkg -f )
-cp "$ARCHDIR"/${PKGNAME}-${VERSION}-${PKGREL}-*.pkg.tar.zst "$OUT/" 2>/dev/null \
-  || cp "$ARCHDIR"/*.pkg.tar.zst "$OUT/"
+if [ "${SKIP_ARCH:-0}" = "1" ]; then
+  echo "SKIP_ARCH=1, 跳过 Arch 包（CI 环境无 makepkg）"
+else
+  ARCHDIR="$OUT/arch"
+  rm -rf "$ARCHDIR"; mkdir -p "$ARCHDIR"
+  cp "$RPMTOP/SOURCES/${PKGNAME}-${VERSION}.tar.gz" "$ARCHDIR/"
+  cp packaging/arch/PKGBUILD packaging/arch/${PKGNAME}.install "$ARCHDIR/"
+  ( cd "$ARCHDIR" && makepkg -f )
+  cp "$ARCHDIR"/${PKGNAME}-${VERSION}-${PKGREL}-*.pkg.tar.zst "$OUT/" 2>/dev/null \
+    || cp "$ARCHDIR"/*.pkg.tar.zst "$OUT/"
+fi
 
 echo
 echo "=== 产物 ==="
