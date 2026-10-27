@@ -1,0 +1,24 @@
+# Maintainer: londy <londy@local>
+# 贡献: 协议逆向自 HP Windows 打印机助手 (UDCDevicePage)
+pkgname=hp-supplies
+pkgver=1.2.1
+pkgrel=1
+pkgdesc="HP 打印机耗材与用量监控（LEDM over USB，无需 HPLIP）"
+arch=('x86_64')
+url="https://localhost/hp-supplies"
+license=('MIT')
+depends=('gtk3' 'libusb')
+makedepends=('gcc' 'make' 'pkgconf')
+install=hp-supplies.install
+source=("$pkgname-$pkgver.tar.gz")
+sha256sums=('SKIP')
+
+build() {
+  cd "$pkgname-$pkgver"
+  make APP_VERSION="$pkgver-$pkgrel"
+}
+
+package() {
+  cd "$pkgname-$pkgver"
+  make install DESTDIR="$pkgdir" PREFIX=/usr APP_VERSION="$pkgver-$pkgrel"
+}

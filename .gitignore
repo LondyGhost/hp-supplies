@@ -1,0 +1,25 @@
+# 构建产物
+out/
+dist/
+*.o
+hp-supplies
+hp-supplies.exe
+hp-m154-supplies
+*.pkg.tar.zst
+*.deb
+*.rpm
+*.AppImage
+*.zip
+src/exp/
+src/main_old.c
+
+# 本地辅助脚本与临时文件
+__pycache__/
+*.pyc
+*.log
+server_main.c
+*.patch.bak
+
+# 截图与私密数据（如需放截图, 先遮挡序列号再提交）
+*.png
+!docs/img/*.png

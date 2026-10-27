@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Name=HP 打印机耗材监控
+Name[en]=HP Printer Supplies
+GenericName=打印机耗材与用量监控
+Comment=查看 HP 打印机碳粉/墨水余量与总打印页数（LEDM over USB）
+Exec=hp-supplies
+Icon=hp-supplies
+Categories=Utility;System;HardwareSettings;
+Keywords=printer;toner;ink;supplies;HP;打印;碳粉;墨水;耗材;页数;
+Terminal=false
+StartupNotify=true

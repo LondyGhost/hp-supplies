@@ -1,0 +1,14 @@
+hp-supplies — HP 打印机耗材与用量监控（LEDM over USB）
+Copyright (c) 2026 londy
+
+本项目是独立开发的互操作实现，用于读取 HP 打印机通过其 USB "HP LEDM"
+接口公开提供的设备状态信息（碳粉余量、打印页数等）。
+
+  1) 本项目与 HP Inc. 无任何关联、合作或背书关系。
+  2) HP、Hewlett-Packard、ColorLaserJet 等为 HP Inc. 的商标，
+     本项目中仅作描述性引用（indicating compatibility），不使用其图形标志。
+  3) 本项目不包含、不复制、不分发 HP 的任何软件代码或受版权保护的资源。
+  4) 本项目为只读工具：不修改设备、不绕过任何技术保护措施或原装耗材认证。
+  5) 示例数据均为虚构。
+
+按 MIT 许可证分发（见 LICENSE）。详细说明见 docs/LEGAL.md。
