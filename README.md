@@ -106,15 +106,26 @@ GUI 顶部状态行同样着色显示（绿=正常 / 橙=提醒 / 红=错误）�
 
 ## Windows 版
 
-`dist/hp-supplies-1.2.1-windows-x64.zip`：解压即用，含 GUI 与命令行
-（`hp-supplies-gui.exe` / `hp-supplies.exe`，GTK3 运行库已随包附带）。
+两个发行包，按系统选择：
+
+- **`dist/hp-supplies-1.2.1-windows-i686.zip`（推荐，Win7 SP1+ 通吃）**：
+  32 位单文件 exe（GUI + 命令行），原生 Win32 界面，不依赖 GTK/UCRT/.NET，
+  无需安装任何运行库，解压即用。适用 Windows 7 SP1 / 8 / 8.1 / 10 / 11
+  的 32 位与 64 位系统（64 位经 WoW64 运行）。
+- `dist/hp-supplies-1.2.1-windows-x64.zip`：64 位 GTK3 界面版（GTK 运行库
+  随包附带），适合现代系统需要 GTK 观感的场景；Win7/8 上不可靠，不建议。
 
 USB 驱动前提：LEDM 接口需绑定为 WinUSB 驱动——装过 HP 官方打印机助手
 的电脑已自带；纯净系统用 [Zadig](https://zadig.akeo.ie) 给 "HP LEDM"
-接口绑定 WinUSB 即可。
+接口绑定 WinUSB 即可（Win7 需先打 SP1 与 KB3033929 补丁才能运行新版 Zadig）。
 
-从源码构建见 `packaging/windows/build-msys2.sh`（MSYS2 UCRT64 环境，
-依赖 gtk3 / libusb / pkgconf 包）。
+从源码构建：
+
+- 32 位 Win7 兼容版：`powershell -File packaging/windows/build-win7-i686.ps1`
+  （i686 mingw-builds msvcrt 工具链 + libusb 静态链接，GUI 为原生 Win32
+  实现 `src/gui-win32.h`，默认 `-D_WIN32_WINNT=0x0601` 锁定 Win7 API 面）
+- 64 位 GTK 版：`packaging/windows/build-msys2.sh`（MSYS2 UCRT64 环境，
+  依赖 gtk3 / libusb / pkgconf 包；脚本自动加 `-DHP_GUI_GTK` 保留 GTK 界面）
 
 ## 从源码构建
 

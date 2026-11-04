@@ -26,8 +26,20 @@
 
 #define _GNU_SOURCE
 
-#include <gtk/gtk.h>
+#ifdef _WIN32
+/* libusb.h pulls in windows.h; keep it from dragging winsock.h in before
+ * winsock2.h (avoids the mingw "include winsock2.h first" conflict) */
+#define WIN32_LEAN_AND_MEAN
+#endif
+
 #include <libusb-1.0/libusb.h>
+
+#if defined(_WIN32) && !defined(HP_GUI_GTK)
+/* Windows default: native Win32 GUI (see src/gui-win32.h) — no GTK dependency.
+ * Compile with -DHP_GUI_GTK to get the GTK3 GUI on Windows (MSYS2 build). */
+#else
+#include <gtk/gtk.h>
+#endif
 
 #ifdef _WIN32
 #include <winsock2.h>
@@ -1099,6 +1111,13 @@ static int text_mode(uint16_t vid, uint16_t pid, const char *host)
 
 /* ---------------------------------------------------------------- GUI */
 
+#if defined(_WIN32) && !defined(HP_GUI_GTK)
+/* Windows: native Win32 GUI, included in this translation unit so it can
+ * reuse the Snapshot types and vocabulary helpers above. */
+#include "gui-win32.h"
+
+#else /* GTK GUI (Linux default, or Windows with -DHP_GUI_GTK) */
+
 typedef struct {
     GtkWidget *win;
     GtkWidget *lbl_product;
@@ -1434,7 +1453,10 @@ static int gui_run(uint16_t vid, uint16_t pid, const char *host)
     gtk_widget_show_all(ui.win);
     start_refresh();
     gtk_main();
+    return 0;
 }
+
+#endif /* GTK GUI */
 
 /* ---------------------------------------------------------------- main */
 
