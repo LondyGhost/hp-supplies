@@ -13,11 +13,11 @@ mkdir -p "$OUT"
 PKGS=$(pkgconf --cflags --libs gtk+-3.0 libusb-1.0)
 
 echo "=== [1/3] 编译 console 版 (hp-supplies.exe) ==="
-gcc -O2 -Wall -DAPP_VERSION="\"$VER\"" -DHP_GUI_GTK -o "$OUT/hp-supplies.exe" \
+gcc -O2 -Wall -DAPP_VERSION="\"$VER\"" -o "$OUT/hp-supplies.exe" \
     src/main.c $PKGS -lpthread -lws2_32
 
 echo "=== [2/3] 编译 GUI 版 (hp-supplies-gui.exe, 无控制台窗口) ==="
-gcc -O2 -Wall -DAPP_VERSION="\"$VER\"" -DHP_GUI_GTK -mwindows -o "$OUT/hp-supplies-gui.exe" \
+gcc -O2 -Wall -DAPP_VERSION="\"$VER\"" -mwindows -o "$OUT/hp-supplies-gui.exe" \
     src/main.c $PKGS -lpthread -lws2_32
 
 echo "=== [3/3] 完成 ==="
