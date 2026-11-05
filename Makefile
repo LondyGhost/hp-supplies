@@ -2,7 +2,7 @@ CC      ?= gcc
 CFLAGS  ?= -O2 -Wall -Wno-deprecated-declarations
 PKG      = gtk+-3.0 libusb-1.0
 PREFIX  ?= /usr
-APP_VERSION ?= 1.2.1
+APP_VERSION ?= 1.2.2
 
 all: hp-supplies
 

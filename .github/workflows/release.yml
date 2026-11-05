@@ -47,6 +47,33 @@ jobs:
           name: linux-packages
           path: artifacts/*
 
+  arch:
+    name: Arch Linux (pkg.tar.zst)
+    runs-on: ubuntu-24.04
+    container:
+      image: ghcr.io/archlinux/archlinux:base-devel
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: pacman -Syu --noconfirm gtk3 libusb sudo
+
+      - name: Build package
+        run: |
+          cd packaging/arch
+          useradd -m builder
+          chown -R builder:builder .
+          sudo -u builder makepkg -sf --noconfirm
+          sudo -u builder makepkg --printsrcinfo > .SRCINFO
+          mkdir -p "$GITHUB_WORKSPACE/artifacts"
+          cp hp-supplies-*.pkg.tar.zst "$GITHUB_WORKSPACE/artifacts/"
+          ls -lh "$GITHUB_WORKSPACE/artifacts"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: arch-packages
+          path: artifacts/*
+
   windows:
     name: Windows (MSYS2 UCRT64)
     runs-on: windows-latest
@@ -97,7 +124,7 @@ jobs:
 
   release:
     name: Publish GitHub Release
-    needs: [linux, windows]
+    needs: [linux, windows, arch]
     if: startsWith(github.ref, 'refs/tags/')
     runs-on: ubuntu-latest
     steps:
@@ -119,10 +146,12 @@ jobs:
             |---|---|
             | `*-amd64.deb` | Debian / Ubuntu / Deepin / UOS |
             | `*-x86_64.rpm` | Fedora / openEuler / openSUSE |
+            | `*-x86_64.pkg.tar.zst` | Arch Linux / CatOS（pacman -U 安装；archlinuxcn 源用户可直接 pacman -S） |
             | `*-x86_64.AppImage` | 任意 Linux 发行版，免安装 |
-            | `*-windows-x64.zip` | Windows（解压即用，含 GTK 运行时） |
+            | `*-windows-x64.zip` | Windows x64（解压即用，含 GTK 运行时） |
+            | `*.SRCINFO` / `.SRCINFO` | Arch 打包元数据 |
 
-            Arch Linux 请用仓库内 `packaging/arch/PKGBUILD` 自行 `makepkg`。
+            Arch Linux / CatOS 请用仓库内 `packaging/arch/PKGBUILD` 或 archlinuxcn 源；
             安装后重新插拔一次 USB 线让 udev 规则生效。
 
             用法：`hp-supplies`（GUI）/ `hp-supplies --text`（终端）/ `hp-supplies --help`
