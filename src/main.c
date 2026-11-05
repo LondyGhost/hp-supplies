@@ -1345,6 +1345,21 @@ static GtkWidget *make_card(gint idx, const char *dotcls, const char *tonercls)
     return frame;
 }
 
+#ifdef G_OS_UNIX
+#include <glib-unix.h>
+#include <signal.h>
+
+/* SIGTERM/SIGINT: quit the main loop cleanly so systemd stop / logout /
+ * Ctrl-C yield a deterministic exit code instead of a signal kill. */
+static gboolean sig_quit(gpointer u)
+{
+    (void)u;
+    snapshot_shutdown();
+    gtk_main_quit();
+    return G_SOURCE_REMOVE;
+}
+#endif
+
 static int gui_run(uint16_t vid, uint16_t pid, const char *host)
 {
     ui.vid = vid;
@@ -1431,9 +1446,19 @@ static int gui_run(uint16_t vid, uint16_t pid, const char *host)
     gtk_box_pack_start(GTK_BOX(foot), ui.lbl_status, TRUE, TRUE, 0);
     gtk_box_pack_start(GTK_BOX(vbox), foot, FALSE, FALSE, 0);
 
+#ifdef G_OS_UNIX
+    /* deterministic exit code when systemd stops the unit or on logout */
+    g_unix_signal_add(SIGINT,  sig_quit, NULL);
+    g_unix_signal_add(SIGTERM, sig_quit, NULL);
+#endif
+
     gtk_widget_show_all(ui.win);
     start_refresh();
     gtk_main();
+
+    /* falling off the end of a non-void function is UB: systemd/KDE session
+     * relaunch marked the unit failed with exit status 1 (register garbage) */
+    return 0;
 }
 
 /* ---------------------------------------------------------------- main */
