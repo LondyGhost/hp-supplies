@@ -2,7 +2,7 @@
 # 一键构建: 二进制 + deb + rpm + AppImage + Arch包
 set -e
 cd "$(dirname "$0")/.."
-VERSION=1.2.1
+VERSION="${VERSION:-1.2.2}"
 PKGREL=1
 PKGNAME=hp-supplies
 OUT=out
