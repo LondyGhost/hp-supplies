@@ -1,10 +1,10 @@
 Name:           hp-supplies
-Version:        1.2.1
+Version:        1.2.2
 Release:        1%{?dist}
 Summary:        HP 打印机耗材与用量监控（LEDM over USB）
 
 License:        MIT
-URL:            https://localhost/hp-supplies
+URL:            https://github.com/LondyGhost/hp-supplies
 Source0:        %{name}-%{version}.tar.gz
 BuildRequires:  gcc, make, pkgconfig(gtk+-3.0), pkgconfig(libusb-1.0)
 Requires:       gtk3, libusb1

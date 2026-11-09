@@ -44,6 +44,9 @@ tar czf "$RPMTOP/SOURCES/${PKGNAME}-${VERSION}.tar.gz" \
     --transform "s,^,${PKGNAME}-${VERSION}/," \
     src data Makefile README.md LICENSE
 cp packaging/rpm/${PKGNAME}.spec "$RPMTOP/SPECS/"
+# spec 模板的 Version/URL 在打包时强制对齐, 避免升版遗漏
+sed -i "s/^Version:.*/Version:        $VERSION/" "$RPMTOP/SPECS/${PKGNAME}.spec"
+sed -i "s#^URL:.*#URL:            https://github.com/LondyGhost/hp-supplies#" "$RPMTOP/SPECS/${PKGNAME}.spec"
 mkdir -p "$RPMTOP/db"
 # Arch 的 rpm-tools 需要指向用户级数据库, 否则报 cannot open Packages database
 rpmbuild --define "_topdir $RPMTOP" --define "_dbpath $RPMTOP/db" \
