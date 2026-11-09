@@ -1,5 +1,5 @@
 Name:           hp-supplies
-Version:        1.2.2
+Version:        1.2.3
 Release:        1%{?dist}
 Summary:        HP 打印机耗材与用量监控（LEDM over USB）
 

@@ -2,12 +2,12 @@ CC      ?= gcc
 CFLAGS  ?= -O2 -Wall -Wno-deprecated-declarations
 PKG      = gtk+-3.0 libusb-1.0
 PREFIX  ?= /usr
-APP_VERSION ?= 1.2.2
+APP_VERSION ?= 1.2.3
 
 all: hp-supplies
 
 hp-supplies: src/main.c
-	$(CC) $(CFLAGS) $(shell pkg-config --cflags $(PKG)) \
+	$(CC) $(CFLAGS) $(LDFLAGS) $(shell pkg-config --cflags $(PKG)) \
 		-DAPP_VERSION='"$(APP_VERSION)"' -o $@ $< \
 		$(shell pkg-config --libs $(PKG)) -lpthread
 

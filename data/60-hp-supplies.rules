@@ -1,4 +1,4 @@
 # HP 打印机 LEDM USB 接口（耗材/用量查询）
-# 允许普通用户访问所有 HP (03f0) USB 设备, 无需 root
-# 如需收紧, 可加 ATTRS{idProduct}=="xxxx" 限定具体型号
-SUBSYSTEM=="usb", ATTRS{idVendor}=="03f0", MODE="0666", TAG+="uaccess"
+# 仅对带 LEDM 接口(class FF/sub 04/proto 01)的 HP 设备授权,
+# 通过 uaccess 授给当前桌面登录用户, lp 组作为无 seat 环境的兜底
+SUBSYSTEM=="usb", ATTRS{idVendor}=="03f0", ENV{ID_USB_INTERFACES}=="*:ff0401:*", MODE="0660", GROUP="lp", TAG+="uaccess"

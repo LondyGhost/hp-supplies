@@ -49,18 +49,18 @@ Windows 的 HP 工具通过 WinUSB 走同一条通道；本程序在 Linux 上�
 
 ### deb (Ubuntu/Debian/Deepin/UOS)
 ```bash
-sudo dpkg -i hp-supplies-1.2.2-amd64.deb
+sudo dpkg -i hp-supplies-1.2.3-amd64.deb
 ```
 
 ### rpm (Fedora/openEuler/openSUSE)
 ```bash
-sudo rpm -ivh hp-supplies-1.2.2-1*.rpm
+sudo rpm -ivh hp-supplies-1.2.3-1*.rpm
 ```
 
 ### AppImage (任意发行版)
 ```bash
-chmod +x hp-supplies-1.2.2-x86_64.AppImage
-./hp-supplies-1.2.2-x86_64.AppImage
+chmod +x hp-supplies-1.2.3-x86_64.AppImage
+./hp-supplies-1.2.3-x86_64.AppImage
 ```
 AppImage 依赖系统 GTK3（主流桌面发行版自带）。
 
@@ -106,7 +106,7 @@ GUI 顶部状态行同样着色显示（绿=正常 / 橙=提醒 / 红=错误）�
 
 ## Windows 版
 
-`dist/hp-supplies-1.2.2-windows-x64.zip`：解压即用，含 GUI 与命令行
+`dist/hp-supplies-1.2.3-windows-x64.zip`：解压即用，含 GUI 与命令行
 （`hp-supplies-gui.exe` / `hp-supplies.exe`，GTK3 运行库已随包附带）。
 
 USB 驱动前提：LEDM 接口需绑定为 WinUSB 驱动——装过 HP 官方打印机助手
